@@ -5,7 +5,10 @@ import (
 	"log"
 	"math/rand"
 	"net"
+	"net/http"
 	"time"
+
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 const (
@@ -20,6 +23,10 @@ func main() {
 	if err != nil {
 		log.Panic("Could not create listener:", err)
 	}
+
+	http.Handle("/metrics", promhttp.Handler())
+	go http.ListenAndServe(":80", nil)
+
 	var conns int
 	connDone := make(chan bool)
 	log.Println("Starting listening on 2222")
