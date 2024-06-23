@@ -4,6 +4,7 @@ import (
 	"log"
 	"net"
 	"time"
+	"os"
 )
 
 const (
@@ -11,6 +12,12 @@ const (
 )
 
 func main() {
+	f, err := os.OpenFile("testlogfile", os.O_RDWR | os.O_CREATE | os.O_APPEND, 0666)
+	if err != nil {
+		log.Fatalf("error opening file: %v", err)
+	}
+	defer f.Close()
+
 	// Create a serve on port 2222
 	ln, err := net.Listen("tcp", ":2222")
 	if err != nil {
@@ -19,6 +26,7 @@ func main() {
 
 	var conns int
 	connDone := make(chan bool)
+	log.SetOutput(f)
 	log.Println("Starting listening on 2222")
 	go func() {
 		for {
